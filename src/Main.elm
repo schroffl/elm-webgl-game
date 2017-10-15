@@ -147,9 +147,6 @@ view model =
                 |> Matrix4.rotate model.tilt (vec3 xAxis 0 zAxis)
                 |> Matrix4.translate (Vector3.negate >> Vector3.scale 2 <| model.position)
 
-        log =
-            Debug.log "Position" model.position
-
         makePositions n =
             if n == 0 then
                 [ vec3 0 0 0 ]
