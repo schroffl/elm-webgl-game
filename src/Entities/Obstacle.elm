@@ -1,0 +1,2 @@
+module Entities.Obstacle exposing (..)
+

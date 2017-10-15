@@ -1,0 +1,24 @@
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Elm WebGL Game</title>
+
+    <style>
+      * {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+
+    <script src="ports/pointer.js"></script>
+    <script src="main.js"></script>
+  </head>
+  <body>
+    <script type="text/javascript">
+      let app = Elm.Main.fullscreen();
+
+      window.pointerModulePort(app);
+    </script>
+  </body>
+</html>
