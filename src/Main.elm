@@ -25,6 +25,7 @@ type alias Model =
     , rotation : Float
     , tilt : Float
     , keys : Keys
+    , captureMouse : Bool
     }
 
 
@@ -34,6 +35,7 @@ type Msg
     | ClickedCanvas
     | MouseMove MouseMovement
     | KeyChange Bool Keyboard.KeyCode
+    | PointerLockState Bool
 
 
 eyeLevel : Float
@@ -54,6 +56,7 @@ main =
                     , Keyboard.downs (KeyChange True)
                     , Keyboard.ups (KeyChange False)
                     , AnimationFrame.diffs Animate
+                    , Pointer.pointerLockChange PointerLockState
                     ]
         }
 
@@ -67,6 +70,7 @@ init =
       , rotation = 0
       , tilt = 0
       , keys = Keys False False False False False False
+      , captureMouse = False
       }
     , getInitialWindowSize
     )
@@ -106,7 +110,10 @@ update msg model =
                 ( newRotation, newTilt ) =
                     applyMouseMovement movement ( model.rotation, model.tilt )
             in
-                ( { model | rotation = newRotation, tilt = newTilt }, Cmd.none )
+                if model.captureMouse then
+                    ( { model | rotation = newRotation, tilt = newTilt }, Cmd.none )
+                else
+                    ( model, Cmd.none )
 
         KeyChange newState keyCode ->
             let
@@ -117,6 +124,9 @@ update msg model =
                     applyKeys newKeys model
             in
                 ( { newModel | keys = newKeys }, Cmd.none )
+
+        PointerLockState state ->
+            ( { model | captureMouse = state }, Cmd.none )
 
 
 view : Model -> Html Msg
