@@ -15,7 +15,6 @@ import Keyboard
 import AnimationFrame
 import Time
 import Entities.Ground as Ground
-import Entities.Obstacle as Obstacle
 
 
 type alias Model =
