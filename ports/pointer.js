@@ -6,7 +6,7 @@ window.pointerModulePort = function(app) {
 
     if(canvas)  {
       canvas.requestPointerLock();
-      canvas.webkitRequestFullscreen();
+      // canvas.webkitRequestFullscreen();
     }
   });
 
