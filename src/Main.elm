@@ -253,13 +253,15 @@ applyKeys { forward, back, left, right, up, down } model =
                 _ ->
                     0
     in
-        { model
-            | velocity =
-                vec3
-                    (direction left right)
-                    (direction down up)
-                    (direction forward back)
-        }
+        if model.captureMouse then
+            { model
+                | velocity =
+                    model.velocity
+                        |> Vector3.setX (direction left right)
+                        |> Vector3.setZ (direction forward back)
+            }
+        else
+            model
 
 
 
