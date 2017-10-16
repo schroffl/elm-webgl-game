@@ -124,7 +124,7 @@ update msg model =
                     ( model, Cmd.none )
 
         KeyChange newState keyCode ->
-            if ( keyCode, newState ) == model.lastKeyboardEvent then
+            if ( keyCode, newState ) == model.lastKeyboardEvent || model.captureMouse then
                 ( model, Cmd.none )
             else
                 let
@@ -272,15 +272,12 @@ applyKeys { forward, back, left, right, up, down } model =
                 _ ->
                     0
     in
-        if model.captureMouse then
-            { model
-                | velocity =
-                    model.velocity
-                        |> Vector3.setX (direction left right)
-                        |> Vector3.setZ (direction forward back)
-            }
-        else
-            model
+        { model
+            | velocity =
+                model.velocity
+                    |> Vector3.setX (direction left right)
+                    |> Vector3.setZ (direction forward back)
+        }
 
 
 
