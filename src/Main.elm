@@ -19,13 +19,16 @@ import Network
 import WebSocket
 
 
+type alias Orientation =
+    ( Float, Float )
+
+
 type alias Model =
     { size : Window.Size
     , perspectiveMatrix : Mat4
     , position : Vec3
     , velocity : Vec3
-    , rotation : Float
-    , tilt : Float
+    , orientation : Orientation
     , keys : Keys
     , captureMouse : Bool
     , lastKeyboardEvent : ( Keyboard.KeyCode, Bool )
@@ -72,8 +75,7 @@ init =
       , perspectiveMatrix = Matrix4.identity
       , position = (vec3 0 eyeLevel 0)
       , velocity = (vec3 0 0 0)
-      , rotation = 0
-      , tilt = 0
+      , orientation = ( 0, 0 )
       , keys = Keys False False False False False False
       , captureMouse = False
       , lastKeyboardEvent = ( -1, False )
@@ -113,11 +115,11 @@ update msg model =
 
         MouseMove movement ->
             let
-                ( newRotation, newTilt ) =
-                    applyMouseMovement movement ( model.rotation, model.tilt )
+                newOrientation =
+                    applyMouseMovement movement model.orientation
             in
                 if model.captureMouse then
-                    ( { model | rotation = newRotation, tilt = newTilt }, Cmd.none )
+                    ( { model | orientation = newOrientation }, Cmd.none )
                 else
                     ( model, Cmd.none )
 
@@ -152,16 +154,19 @@ view model =
         size =
             model.size
 
+        ( rotation, tilt ) =
+            model.orientation
+
         xAxis =
-            cos model.rotation
+            cos rotation
 
         zAxis =
-            sin model.rotation
+            sin rotation
 
         viewMatrix =
             model.perspectiveMatrix
-                |> Matrix4.rotate model.rotation (vec3 0 1 0)
-                |> Matrix4.rotate model.tilt (vec3 xAxis 0 zAxis)
+                |> Matrix4.rotate rotation (vec3 0 1 0)
+                |> Matrix4.rotate tilt (vec3 xAxis 0 zAxis)
                 |> Matrix4.translate (Vector3.negate >> Vector3.scale 2 <| model.position)
 
         makePositions n =
@@ -210,7 +215,7 @@ decodeMouseEvent =
         (Decode.field "movementY" Decode.float)
 
 
-applyMouseMovement : MouseMovement -> ( Float, Float ) -> ( Float, Float )
+applyMouseMovement : MouseMovement -> Orientation -> Orientation
 applyMouseMovement ( mvX, mvY ) ( rotation, tilt ) =
     let
         newRotation =
@@ -305,5 +310,5 @@ physics dt model =
         | position =
             Vector3.add model.position <|
                 Vector3.scale dt <|
-                    rotateVector3Y model.rotation model.velocity
+                    rotateVector3Y (Tuple.first model.orientation) model.velocity
     }
