@@ -28,6 +28,7 @@ type alias Model =
     , tilt : Float
     , keys : Keys
     , captureMouse : Bool
+    , lastKeyboardEvent : ( Keyboard.KeyCode, Bool )
     }
 
 
@@ -75,6 +76,7 @@ init =
       , tilt = 0
       , keys = Keys False False False False False False
       , captureMouse = False
+      , lastKeyboardEvent = ( -1, False )
       }
     , getInitialWindowSize
     )
@@ -120,14 +122,22 @@ update msg model =
                     ( model, Cmd.none )
 
         KeyChange newState keyCode ->
-            let
-                newKeys =
-                    applyKeyChange newState keyCode model.keys
+            if ( keyCode, newState ) == model.lastKeyboardEvent then
+                ( model, Cmd.none )
+            else
+                let
+                    newKeys =
+                        applyKeyChange newState keyCode model.keys
 
-                newModel =
-                    applyKeys newKeys model
-            in
-                ( { newModel | keys = newKeys }, Cmd.none )
+                    newModel =
+                        applyKeys newKeys model
+                in
+                    ( { newModel
+                        | keys = newKeys
+                        , lastKeyboardEvent = ( keyCode, newState )
+                      }
+                    , Cmd.none
+                    )
 
         PointerLockState state ->
             ( { model | captureMouse = state }, Cmd.none )
