@@ -124,7 +124,7 @@ update msg model =
                     ( model, Cmd.none )
 
         KeyChange newState keyCode ->
-            if ( keyCode, newState ) == model.lastKeyboardEvent || model.captureMouse then
+            if not model.captureMouse || ( keyCode, newState ) == model.lastKeyboardEvent then
                 ( model, Cmd.none )
             else
                 let
