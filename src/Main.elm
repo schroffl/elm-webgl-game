@@ -15,6 +15,8 @@ import Keyboard
 import AnimationFrame
 import Time
 import Entities.Ground as Ground
+import Network
+import WebSocket
 
 
 type alias Model =
@@ -36,6 +38,7 @@ type Msg
     | MouseMove MouseMovement
     | KeyChange Bool Keyboard.KeyCode
     | PointerLockState Bool
+    | WebSocketMessage String
 
 
 eyeLevel : Float
@@ -57,6 +60,7 @@ main =
                     , Keyboard.ups (KeyChange False)
                     , AnimationFrame.diffs Animate
                     , Pointer.pointerLockChange PointerLockState
+                    , WebSocket.listen "ws://127.0.0.1:9160" WebSocketMessage
                     ]
         }
 
@@ -127,6 +131,9 @@ update msg model =
 
         PointerLockState state ->
             ( { model | captureMouse = state }, Cmd.none )
+
+        WebSocketMessage _ ->
+            ( model, Cmd.none )
 
 
 view : Model -> Html Msg
