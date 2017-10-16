@@ -6,3 +6,9 @@
 body {
   background-color: white;
 }
+
+.crosshair {
+  position: fixed;
+  top: calc(50% - 7.5px);
+  left: calc(50% - 7.5px);
+}
