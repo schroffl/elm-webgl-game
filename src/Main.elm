@@ -123,7 +123,9 @@ update msg model =
                     applyMouseMovement movement model.orientation
             in
                 if model.captureMouse then
-                    ( { model | orientation = newOrientation }, Cmd.none )
+                    ( { model | orientation = newOrientation }
+                    , Network.send << uncurry Network.MouseMove <| movement
+                    )
                 else
                     ( model, Cmd.none )
 
@@ -142,14 +144,19 @@ update msg model =
                         | keys = newKeys
                         , lastKeyboardEvent = ( keyCode, newState )
                       }
-                    , Cmd.none
+                    , Network.send <| Network.KeyChange keyCode newState
                     )
 
         PointerLockState state ->
             ( { model | captureMouse = state }, Cmd.none )
 
-        WebSocketMessage _ ->
-            ( model, Cmd.none )
+        WebSocketMessage str ->
+            case Network.parseServerMessage str of
+                Just (Network.Connected _) ->
+                    update (GUIMessage GUI.Connected) model
+
+                Nothing ->
+                    ( model, Cmd.none )
 
         GUIMessage guiMsg ->
             let
