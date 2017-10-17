@@ -67,12 +67,13 @@ mapTypeToDecoder messageType =
 
 parse1 : (a -> ServerMessage) -> Decode.Decoder a -> Decode.Decoder ServerMessage
 parse1 msg decoder =
-    Decode.map msg (Decode.field "1" decoder)
+    Decode.map msg (Decode.field "0" decoder)
 
 
 type PlayerMessage
     = ConnectionRequest String
     | KeyChange KeyCode Bool
+    | MouseMove Float Float
 
 
 encodePlayerMessage : PlayerMessage -> String
@@ -85,6 +86,9 @@ encodePlayerMessage msg =
 
                 KeyChange keyCode newState ->
                     ( "keychange", [ Encode.int keyCode, Encode.bool newState ] )
+
+                MouseMove x y ->
+                    ( "mousemove", [ Encode.float x, Encode.float y ] )
 
         mapArgs n args =
             case args of
