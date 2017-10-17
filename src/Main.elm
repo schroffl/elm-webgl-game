@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import WebGL as GL exposing (..)
 import WebGL.Settings as GLSettings
-import Html exposing (Html, program, text, Attribute)
+import Html exposing (Html, program, div, Attribute)
 import Html.Attributes exposing (width, height)
 import Html.Events exposing (onClick, on)
 import Math.Matrix4 as Matrix4 exposing (Mat4)
@@ -17,6 +17,7 @@ import Time
 import Entities.Ground as Ground
 import Network
 import WebSocket
+import GUI
 
 
 type alias Orientation =
@@ -31,6 +32,7 @@ type alias Model =
     , orientation : Orientation
     , keys : Keys
     , captureMouse : Bool
+    , guiModel : GUI.Model
     , lastKeyboardEvent : ( Keyboard.KeyCode, Bool )
     }
 
@@ -43,6 +45,7 @@ type Msg
     | KeyChange Bool Keyboard.KeyCode
     | PointerLockState Bool
     | WebSocketMessage String
+    | GUIMessage GUI.Msg
 
 
 eyeLevel : Float
@@ -78,6 +81,7 @@ init =
       , orientation = ( 0, 0 )
       , keys = Keys False False False False False False
       , captureMouse = False
+      , guiModel = GUI.init
       , lastKeyboardEvent = ( -1, False )
       }
     , getInitialWindowSize
@@ -147,6 +151,13 @@ update msg model =
         WebSocketMessage _ ->
             ( model, Cmd.none )
 
+        GUIMessage guiMsg ->
+            let
+                ( newGuiModel, command ) =
+                    GUI.update guiMsg model.guiModel
+            in
+                ( { model | guiModel = newGuiModel }, command )
+
 
 view : Model -> Html Msg
 view model =
@@ -175,9 +186,12 @@ view model =
             else
                 vec3 (n - 1) 0 0 :: makePositions (n - 1)
     in
-        GL.toHtml
-            [ width size.width, height size.height, onClick ClickedCanvas, onMouseMove MouseMove ]
-            (List.map (Ground.groundEntity viewMatrix) (makePositions 4))
+        div []
+            [ GL.toHtml
+                [ width size.width, height size.height, onClick ClickedCanvas, onMouseMove MouseMove ]
+                (List.map (Ground.groundEntity viewMatrix) (makePositions 4))
+            , Html.map GUIMessage (GUI.view model.guiModel)
+            ]
 
 
 getInitialWindowSize : Cmd Msg
