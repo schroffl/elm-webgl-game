@@ -73,7 +73,6 @@ parse1 msg decoder =
 type PlayerMessage
     = ConnectionRequest String
     | KeyChange KeyCode Bool
-    | MouseMove Float Float
 
 
 encodePlayerMessage : PlayerMessage -> String
@@ -86,9 +85,6 @@ encodePlayerMessage msg =
 
                 KeyChange keyCode newState ->
                     ( "keychange", [ Encode.int keyCode, Encode.bool newState ] )
-
-                MouseMove x y ->
-                    ( "mousemove", [ Encode.float x, Encode.float y ] )
 
         mapArgs n args =
             case args of

@@ -118,16 +118,12 @@ update msg model =
                 )
 
         MouseMove movement ->
-            let
-                newOrientation =
-                    applyMouseMovement movement model.orientation
-            in
-                if model.captureMouse then
-                    ( { model | orientation = newOrientation }
-                    , Network.send << uncurry Network.MouseMove <| movement
-                    )
-                else
-                    ( model, Cmd.none )
+            if model.captureMouse then
+                ( { model | orientation = applyMouseMovement movement model.orientation }
+                , Cmd.none
+                )
+            else
+                ( model, Cmd.none )
 
         KeyChange newState keyCode ->
             if not model.captureMouse || ( keyCode, newState ) == model.lastKeyboardEvent then
