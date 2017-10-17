@@ -1,4 +1,4 @@
-module Network exposing (..)
+module Network exposing (send, connect, parseServerMessage, PlayerMessage(..), ServerMessage(..))
 
 import Json.Decode as Decode
 import Json.Encode as Encode
