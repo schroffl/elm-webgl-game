@@ -222,14 +222,13 @@ type alias Keys =
 
 onMouseMove : (MouseMovement -> Msg) -> Attribute Msg
 onMouseMove message =
-    on "mousemove" (Decode.map message decodeMouseEvent)
-
-
-decodeMouseEvent : Decode.Decoder MouseMovement
-decodeMouseEvent =
-    Decode.map2 (,)
-        (Decode.field "movementX" Decode.float)
-        (Decode.field "movementY" Decode.float)
+    let
+        decoder =
+            Decode.map2 (,)
+                (Decode.field "movementX" Decode.float)
+                (Decode.field "movementY" Decode.float)
+    in
+        on "mousemove" <| Decode.map message decoder
 
 
 applyMouseMovement : MouseMovement -> Orientation -> Orientation
