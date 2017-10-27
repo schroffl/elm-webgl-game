@@ -45,7 +45,6 @@ mapTypeToDecoder messageType =
 
 type PlayerMessage
     = ConnectionRequest String
-    | KeyChange KeyCode Bool
 
 
 encodePlayerMessage : PlayerMessage -> String
@@ -55,9 +54,6 @@ encodePlayerMessage msg =
             case msg of
                 ConnectionRequest username ->
                     ( "connection_request", [ Encode.string username ] )
-
-                KeyChange keyCode newState ->
-                    ( "keychange", [ Encode.int keyCode, Encode.bool newState ] )
 
         mapArgs n args =
             case args of
