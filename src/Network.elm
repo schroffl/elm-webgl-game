@@ -21,53 +21,26 @@ type ServerMessage
     = Connected String
 
 
-
--- TODO: Refactor for the looks and (efficiency?)
-
-
-parseServerMessage : String -> Maybe ServerMessage
+parseServerMessage : String -> Result String ServerMessage
 parseServerMessage str =
     let
-        typeDecoder =
-            Decode.field "type" Decode.string
+        messageType =
+            Decode.decodeString (Decode.field "type" Decode.string) str
 
-        resultMessageType =
-            Decode.decodeString typeDecoder str
-
-        maybeDataDecoder =
-            case resultMessageType of
-                Ok msgType ->
-                    mapTypeToDecoder msgType
-
-                _ ->
-                    Nothing
+        dataDecoder =
+            messageType |> Result.andThen mapTypeToDecoder
     in
-        case maybeDataDecoder of
-            Just decoder ->
-                case Decode.decodeString decoder str of
-                    Ok msg ->
-                        Just msg
-
-                    Err _ ->
-                        Nothing
-
-            Nothing ->
-                Nothing
+        dataDecoder |> Result.andThen (flip Decode.decodeString str)
 
 
-mapTypeToDecoder : String -> Maybe (Decode.Decoder ServerMessage)
+mapTypeToDecoder : String -> Result String (Decode.Decoder ServerMessage)
 mapTypeToDecoder messageType =
     case messageType of
         "connected" ->
-            Just <| parse1 Connected Decode.string
+            Ok <| Decode.succeed Connected
 
         _ ->
-            Nothing
-
-
-parse1 : (a -> ServerMessage) -> Decode.Decoder a -> Decode.Decoder ServerMessage
-parse1 msg decoder =
-    Decode.map msg (Decode.field "0" decoder)
+            Err <| "Unknown message type: " ++ messageType
 
 
 type PlayerMessage
