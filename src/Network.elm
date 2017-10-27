@@ -18,7 +18,7 @@ connect =
 
 
 type ServerMessage
-    = Connected String
+    = Connected
 
 
 parseServerMessage : String -> Result String ServerMessage
