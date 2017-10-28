@@ -84,9 +84,12 @@ update msg model =
             ( model, Pointer.lockPointer )
 
         MouseMove movement ->
-            ( { model | camera = Cam.applyMouseMovement movement model.camera }
-            , Cmd.none
-            )
+            if model.captureMouse then
+                ( { model | camera = Cam.applyMouseMovement movement model.camera }
+                , Cmd.none
+                )
+            else
+                ( model, Cmd.none )
 
         KeyChange newState keyCode ->
             if not model.captureMouse || ( keyCode, newState ) == model.lastKeyboardEvent then
