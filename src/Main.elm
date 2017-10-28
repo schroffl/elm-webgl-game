@@ -73,7 +73,12 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Resize newSize ->
-            ( { model | size = newSize }, Cmd.none )
+            ( { model
+                | size = newSize
+                , camera = Cam.updatePerspective newSize model.camera
+              }
+            , Cmd.none
+            )
 
         ClickedCanvas ->
             ( model, Pointer.lockPointer )
