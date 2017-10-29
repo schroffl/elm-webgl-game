@@ -56,11 +56,11 @@ updatePerspective size cam =
             toFloat size.height
 
         ratio =
-            Debug.log "Ratio" (width / height)
+            width / height
     in
         { cam
             | perspectiveMatrix =
-                Matrix4.makePerspective 45 (ratio) 0.01 100
+                Matrix4.makePerspective 45 ratio 0.01 100
         }
 
 
