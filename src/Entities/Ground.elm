@@ -12,30 +12,31 @@ type alias Vertex =
 
 type alias Uniforms =
     { viewMatrix : Mat4
-    , position : Vec3
+    , size : Float
     }
 
 
-groundEntity : Mat4 -> Vec3 -> Entity
-groundEntity viewMatrix position =
+groundEntity : Mat4 -> Float -> Entity
+groundEntity viewMatrix size =
     GL.entity
         vertexShader
         fragmentShader
-        (GL.triangles groundMesh)
-        (Uniforms viewMatrix position)
+        groundMesh
+        (Uniforms viewMatrix size)
 
 
-groundMesh : List ( Vertex, Vertex, Vertex )
+groundMesh : Mesh Vertex
 groundMesh =
-    [ ( Vertex (vec3 -1 -1 1)
-      , Vertex (vec3 -1 -1 -1)
-      , Vertex (vec3 1 -1 1)
-      )
-    , ( Vertex (vec3 1 -1 1)
-      , Vertex (vec3 -1 -1 -1)
-      , Vertex (vec3 1 -1 -1)
-      )
-    ]
+    GL.triangles
+        [ ( Vertex (vec3 -1 0 1)
+          , Vertex (vec3 -1 0 -1)
+          , Vertex (vec3 1 0 1)
+          )
+        , ( Vertex (vec3 1 0 1)
+          , Vertex (vec3 -1 0 -1)
+          , Vertex (vec3 1 0 -1)
+          )
+        ]
 
 
 vertexShader : Shader Vertex Uniforms { vColor : Vec3 }
@@ -45,14 +46,14 @@ vertexShader =
 
         attribute vec3 vertexPosition;
         uniform mat4 viewMatrix;
-        uniform vec3 position;
+        uniform float size;
         varying vec3 vColor;
 
         void main() {
-          vec3 finalPosition = vertexPosition + position * vec3(2);
+          vec3 finalPosition = vertexPosition * vec3(size, 0, size);
 
           gl_Position = viewMatrix * vec4(finalPosition, 1);
-          vColor = position / vec3(4);
+          vColor = finalPosition / vec3(size, 0, size);
         }
     |]
 
