@@ -107,7 +107,12 @@ update msg model =
             ( { model | captureMouse = state }, Cmd.none )
 
         WebSocketMessage str ->
-            ( model, Cmd.none )
+            case Network.parseServerMessage str of
+                Ok Network.Connected ->
+                    update (GUIMessage GUI.Connected) model
+
+                _ ->
+                    ( model, Cmd.none )
 
         GUIMessage guiMsg ->
             let
