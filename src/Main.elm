@@ -95,9 +95,13 @@ update msg model =
             if not model.captureMouse || ( keyCode, newState ) == model.lastKeyboardEvent then
                 ( model, Cmd.none )
             else
-                ( { model | lastKeyboardEvent = ( keyCode, newState ) }
-                , Cmd.none
-                )
+                let
+                    url =
+                        model.guiModel.url
+                in
+                    ( { model | lastKeyboardEvent = ( keyCode, newState ) }
+                    , Network.send url <| Network.KeyChange keyCode newState
+                    )
 
         PointerLockState state ->
             ( { model | captureMouse = state }, Cmd.none )
