@@ -8,12 +8,14 @@ import Network
 
 type alias Model =
     { username : String
+    , url : String
     , connected : Bool
     }
 
 
 type Msg
     = UsernameInput String
+    | UrlInput String
     | Connect
     | Connected
 
@@ -21,6 +23,7 @@ type Msg
 init : Model
 init =
     { username = ""
+    , url = "ws://"
     , connected = False
     }
 
@@ -31,6 +34,13 @@ view model =
         [ div [ class "menu", hidden model.connected ]
             [ div []
                 [ input
+                    [ type_ "text"
+                    , onInput UrlInput
+                    , value model.url
+                    , placeholder "Url"
+                    ]
+                    []
+                , input
                     [ type_ "text"
                     , onInput UsernameInput
                     , value model.username
@@ -49,8 +59,11 @@ update msg model =
         UsernameInput newValue ->
             ( { model | username = newValue }, Cmd.none )
 
+        UrlInput newUrl ->
+            ( { model | url = newUrl }, Cmd.none )
+
         Connect ->
-            ( model, Network.connect model.username )
+            ( model, Network.connect model.url model.username )
 
         Connected ->
             ( { model | connected = True }, Cmd.none )

@@ -46,13 +46,13 @@ main =
         , update = update
         , view = view
         , subscriptions =
-            always <|
+            \model ->
                 Sub.batch
                     [ Window.resizes Resize
                     , Keyboard.downs (KeyChange True)
                     , Keyboard.ups (KeyChange False)
                     , Pointer.pointerLockChange PointerLockState
-                    , WebSocket.listen "ws://127.0.0.1:9160" WebSocketMessage
+                    , WebSocket.listen model.guiModel.url WebSocketMessage
                     ]
         }
 

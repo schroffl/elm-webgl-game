@@ -7,14 +7,14 @@ import Result
 import WebSocket
 
 
-send : PlayerMessage -> Cmd msg
-send =
-    WebSocket.send "ws://127.0.0.1:9160" << encodePlayerMessage
+send : String -> PlayerMessage -> Cmd msg
+send url msg =
+    WebSocket.send url <| encodePlayerMessage msg
 
 
-connect : String -> Cmd msg
-connect =
-    send << ConnectionRequest
+connect : String -> String -> Cmd msg
+connect url username =
+    send url <| ConnectionRequest username
 
 
 type ServerMessage
